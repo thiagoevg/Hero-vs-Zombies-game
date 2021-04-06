@@ -2,13 +2,17 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-/////////CARREGA IMAGENS DOS COMPONENTES/////////////
+/////////CARREGA IMAGENS DOS COMPONENTES///////////
 
-//Background
+//Background image
 const background = new Image();
 background.src = "images/background.png";
 
-//Hero dieing
+//gameOver image
+const gameoverPicture = new Image();
+gameoverPicture.src = "images/game-over.png";
+
+//Hero dieing images
 const heroDieingImages = [];
 for (let i = 0; i <= 9; i++) {
   const newImage = new Image();
@@ -16,7 +20,7 @@ for (let i = 0; i <= 9; i++) {
   heroDieingImages.push(newImage);
 }
 
-//Hero shooting
+//Hero shooting images
 const heroShootingImages = [];
 for (let i = 0; i <= 9; i++) {
   const newImage = new Image();
@@ -24,7 +28,7 @@ for (let i = 0; i <= 9; i++) {
   heroShootingImages.push(newImage);
 }
 
-//Zombie walking
+//Zombie walking images
 const zombieWalkingImages = [];
 for (let i = 0; i <= 9; i++) {
   const newImage = new Image();
@@ -32,7 +36,7 @@ for (let i = 0; i <= 9; i++) {
   zombieWalkingImages.push(newImage);
 }
 
-//Zombie dieing
+//Zombie dieing images
 const zombieDieingImages = [];
 for (let i = 0; i <= 7; i++) {
   const newImage = new Image();
@@ -40,7 +44,7 @@ for (let i = 0; i <= 7; i++) {
   zombieDieingImages.push(newImage);
 }
 
-//Zombie attacking
+//Zombie attacking images
 const zombieAttackingImages = [];
 for (let i = 0; i <= 7; i++) {
   const newImage = new Image();
@@ -48,11 +52,25 @@ for (let i = 0; i <= 7; i++) {
   zombieAttackingImages.push(newImage);
 }
 
-//Projétil
+//Projétil image
 const bullet = new Image();
 bullet.src = "images/bullet.png";
 
-//////////////COMPONENT//////////////
+/////////CARREGA SONS DO JOGO/////////
+
+const bangSound = new Audio();
+bangSound.src = "sounds/bang.wav";
+bangSound.volume = 0.1;
+
+const zombieSound = new Audio();
+zombieSound.src = "sounds/zombie.wav";
+zombieSound.volume = 0.1;
+
+const screamSound = new Audio();
+screamSound.src = "sounds/scream.wav";
+screamSound.volume = 0.1;
+
+///////CLASS///////COMPONENT//////////////
 
 class Component {
   constructor(x, y, width, height) {
@@ -87,7 +105,7 @@ class Component {
   };
 }
 
-//////////////HERO//////////////
+///////CLASS///////HERO//////////////
 
 class Hero extends Component {
   constructor(x, y, width, height, shootingArr, dieingArr) {
@@ -121,7 +139,7 @@ class Hero extends Component {
   };
 }
 
-////////////ZOMBIES////////////
+//////CLASS//////ZOMBIES////////////
 
 class Zombie extends Component {
   constructor(x, y, width, height, walkingArr, dieingArr, attackingArr) {
@@ -129,7 +147,7 @@ class Zombie extends Component {
     this.walkingImagesArr = walkingArr;
     this.dieingImagesArr = dieingArr;
     this.attackingImagesArr = attackingArr;
-    this.dx = -2;
+    this.dx = -3;
     this.status = "alive";
     this.frames = 0;
     this.pictureFrame = 0;
@@ -149,6 +167,15 @@ class Zombie extends Component {
     if (this.status === "dead") {
       ctx.drawImage(
         this.dieingImagesArr[this.pictureFrame],
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      );
+    }
+    if (this.status === "attack") {
+      ctx.drawImage(
+        this.attackingImagesArr[this.pictureFrame],
         this.x,
         this.y,
         this.width,
@@ -200,6 +227,7 @@ class Game {
     this.zombies = [];
     this.animationId;
     this.frames = 0;
+    this.gameoverPicture = gameoverPicture;
   }
 
   //Limpa canvas a cada frame
@@ -235,7 +263,9 @@ class Game {
         frames -= 1;
         this.player.pictureFrame = frames;
         if (frames === 0) {
+          bangSound.play();
           this.generateBullet();
+
           return;
         }
         this.shootAnimation(frames);
@@ -251,7 +281,7 @@ class Game {
   //Gera zumbis em posições variadas
   generateZombies() {
     this.frames++;
-    if (this.frames % 60 === 0) {
+    if (this.frames % 70 === 0) {
       const originX = canvas.width;
 
       const minY = 220;
@@ -275,6 +305,7 @@ class Game {
     let frames = 0;
     zombie.status = "dead";
     zombie.dx = 0;
+    zombieSound.play();
     this.zombieDieingAnimation(frames, zombie, zombieIdx);
   };
 
@@ -301,19 +332,29 @@ class Game {
     );
   };
 
+  gameOver = () => {
+    cancelAnimationFrame(this.animationId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(this.gameoverPicture, 0, 0, canvas.width, canvas.height);
+  };
+
   checkGameOver = () => {
-    this.zombies.forEach((zombie) => {
+    this.zombies.forEach((zombie, zombieIdx) => {
       if (zombie.killed(this.player)) {
-        zombie.status = "attack";
+        this.zombieDied(zombie, zombieIdx);
         this.heroDied(this.player);
       }
     });
   };
 
+  //////CHECAR REDUNDÂNCIA DO CÓDIGO
+  //Verificar se é possível adicionar classe genérica para hero and zombies
+
   heroDied = (hero) => {
     let frames = 0;
     hero.status = "dead";
     hero.dx = 0;
+    screamSound.play();
     this.heroDieingAnimation(frames, hero);
   };
 
@@ -322,12 +363,14 @@ class Game {
       frames += 1;
       hero.pictureFrame = frames;
       if (frames === hero.dieingImagesArr.length - 1) {
-        cancelAnimationFrame(this.animationId);
+        this.gameOver();
         return;
       }
       this.heroDieingAnimation(frames, hero);
     }, 100);
   };
+
+  //////////////////
 
   //Inicia efetivamente o jogo
   start = () => {
