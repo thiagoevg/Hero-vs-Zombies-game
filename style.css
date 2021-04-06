@@ -1,0 +1,18 @@
+window {
+  min-width: 700px;
+}
+body {
+  padding: 0;
+  text-align: center;
+}
+
+#game-intro {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 700px;
+  height: 600px;
+  margin: 0 auto;
+  background-color: black;
+  color: white;
+}
