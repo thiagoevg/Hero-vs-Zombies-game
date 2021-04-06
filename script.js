@@ -109,6 +109,15 @@ class Hero extends Component {
         this.height
       );
     }
+    if (this.status === "dead") {
+      ctx.drawImage(
+        this.dieingImagesArr[this.pictureFrame],
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      );
+    }
   };
 }
 
@@ -147,6 +156,15 @@ class Zombie extends Component {
       );
     }
   };
+
+  killed(hero) {
+    return !(
+      this.bottom() < hero.top() ||
+      this.top() > hero.bottom() ||
+      this.right() < hero.left() ||
+      this.left() > hero.right()
+    );
+  }
 }
 
 //////////////BULLET/////////////
@@ -233,7 +251,7 @@ class Game {
   //Gera zumbis em posições variadas
   generateZombies() {
     this.frames++;
-    if (this.frames % 100 === 0) {
+    if (this.frames % 60 === 0) {
       const originX = canvas.width;
 
       const minY = 220;
@@ -283,7 +301,33 @@ class Game {
     );
   };
 
-  checkGameOver = () => {};
+  checkGameOver = () => {
+    this.zombies.forEach((zombie) => {
+      if (zombie.killed(this.player)) {
+        zombie.status = "attack";
+        this.heroDied(this.player);
+      }
+    });
+  };
+
+  heroDied = (hero) => {
+    let frames = 0;
+    hero.status = "dead";
+    hero.dx = 0;
+    this.heroDieingAnimation(frames, hero);
+  };
+
+  heroDieingAnimation = (frames, hero) => {
+    setTimeout(() => {
+      frames += 1;
+      hero.pictureFrame = frames;
+      if (frames === hero.dieingImagesArr.length - 1) {
+        cancelAnimationFrame(this.animationId);
+        return;
+      }
+      this.heroDieingAnimation(frames, hero);
+    }, 100);
+  };
 
   //Inicia efetivamente o jogo
   start = () => {
