@@ -281,7 +281,7 @@ class Game {
   //Gera zumbis em posições variadas
   generateZombies() {
     this.frames++;
-    if (this.frames % 70 === 0) {
+    if (this.frames % 50 === 0) {
       const originX = canvas.width;
 
       const minY = 220;
@@ -410,13 +410,14 @@ startGame = () => {
   const gameBoard = document.querySelector("#game-board");
   document.querySelector("body").removeChild(gameBoard);
 
-  //Adiciona eventListener à tela introdutória para o início do jogo
+  // Adiciona eventListener à tela introdutória para o início do jogo
   const gameIntro = document.querySelector("#game-intro");
   gameIntro.addEventListener("click", () => {
     //Remove tela introdutória
     document.querySelector("body").removeChild(gameIntro);
     //Reintroduz o canvas
     document.querySelector("body").appendChild(gameBoard);
+    bangSound.play();
   });
 
   //Cria herói
@@ -424,17 +425,17 @@ startGame = () => {
 
   //Cria novo jogo
   const game = new Game(hero);
-  //Adiciona arqueiro na lista de componentes
+  //Adiciona herói na lista de componentes
   game.components.push(hero);
 
-  //Adiciona eventListener para o posicionamento do arqueiro
+  //Adiciona eventListener para o posicionamento do player
   document.addEventListener("mousemove", (e) => {
     if (e.clientY >= 290 && e.clientY <= 570) {
       hero.y = e.clientY - 90;
     }
   });
 
-  //Adiciona eventListener 'click' para disparar flecha
+  //Adiciona eventListener 'click' para disparar projétil
   gameBoard.addEventListener("click", () => {
     game.shoot();
   });
