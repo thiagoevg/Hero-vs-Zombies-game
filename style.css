@@ -10,13 +10,17 @@ body {
 h1,
 h3 {
   margin: 0;
-  color: rgb(0, 153, 0);
   text-shadow: 3px 3px rgba(0, 0, 0, 0.6);
 }
 
 h1 {
   font-size: 3rem;
   margin-top: 12rem;
+  color: rgb(0, 230, 0);
+}
+
+h3 {
+  color: rgb(204, 255, 204);
 }
 
 #game-intro {

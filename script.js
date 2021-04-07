@@ -58,10 +58,6 @@ bullet.src = "images/bullet.png";
 
 /////////CARREGA SONS DO JOGO/////////
 
-const bangSound = new Audio();
-bangSound.src = "sounds/bang.wav";
-bangSound.volume = 0.1;
-
 const zombieSound = new Audio();
 zombieSound.src = "sounds/zombie.wav";
 zombieSound.volume = 0.1;
@@ -274,8 +270,11 @@ class Game {
 
   //Cria projétio e adiciona na lista de componentes
   generateBullet = () => {
+    //Obs: o som do disparo precisou se instanciado aqui para evitar problemas de assincronicidade
+    const bangSound = new Audio();
+    bangSound.src = "sounds/bang.wav";
+    bangSound.volume = 0.1;
     bangSound.play();
-    bangSound.pause();
     this.bullets.push(new Bullet(80, this.player.y + 70, 20, 30, bullet));
   };
 
@@ -319,7 +318,7 @@ class Game {
         return;
       }
       this.zombieDieingAnimation(frames, zombie, zombieIdx);
-    }, 100);
+    }, 70);
   };
 
   checkKill = () => {
@@ -418,7 +417,12 @@ startGame = () => {
     document.querySelector("body").removeChild(gameIntro);
     //Reintroduz o canvas
     document.querySelector("body").appendChild(gameBoard);
-    bangSound.play();
+    const bangSoundIntro = new Audio();
+    bangSoundIntro.src = "sounds/bang.wav";
+    bangSoundIntro.volume = 0.1;
+    bangSoundIntro.play();
+    //Inicia o jogo efetivamente
+    game.start();
   });
 
   //Cria herói
@@ -438,11 +442,8 @@ startGame = () => {
 
   //Adiciona eventListener 'click' para disparar projétil
   gameBoard.addEventListener("click", () => {
-    game.shoot();
+    setTimeout(game.shoot, 200);
   });
-
-  //Inicia o jogo efetivamente
-  game.start();
 };
 
 //Espera o tempo de processamento dos componentes para iniciar o jogo
