@@ -213,7 +213,7 @@ class Bullet extends Component {
   };
 }
 
-////////////////GAME////////////////
+/////////CLASS///////GAME////////////////
 
 class Game {
   constructor(player) {
@@ -224,6 +224,7 @@ class Game {
     this.animationId;
     this.frames = 0;
     this.gameoverPicture = gameoverPicture;
+    this.score = 0;
   }
 
   //Limpa canvas a cada frame
@@ -325,6 +326,7 @@ class Game {
     this.bullets.forEach((bullet, bulletIdx) =>
       this.zombies.forEach((zombie, zombieIdx) => {
         if (bullet.killed(zombie)) {
+          this.score++;
           this.zombieDied(zombie, zombieIdx);
           this.bullets.splice(bulletIdx, 1);
         }
@@ -370,6 +372,14 @@ class Game {
     }, 100);
   };
 
+  updateScore() {
+    ctx.font = "30px Verdana";
+    ctx.fillStyle = "white";
+    ctx.fillText(`Kills:`, 90, 70);
+    ctx.drawImage(zombieDieingImages[3], 160, 0, 80, 80);
+    ctx.fillText(`x${this.score}`, 230, 70);
+  }
+
   //////////////////
 
   //Inicia efetivamente o jogo
@@ -387,6 +397,9 @@ class Game {
 
     //Gera zumbis
     this.generateZombies();
+
+    //Atualiza score
+    this.updateScore();
 
     //Atualiza componentes
     this.updateComponents();
