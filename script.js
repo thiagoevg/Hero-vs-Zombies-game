@@ -263,7 +263,6 @@ class Game {
         frames -= 1;
         this.player.pictureFrame = frames;
         if (frames === 0) {
-          bangSound.play();
           this.generateBullet();
 
           return;
@@ -275,6 +274,8 @@ class Game {
 
   //Cria projétio e adiciona na lista de componentes
   generateBullet = () => {
+    bangSound.play();
+    bangSound.pause();
     this.bullets.push(new Bullet(80, this.player.y + 70, 20, 30, bullet));
   };
 
