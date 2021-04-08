@@ -347,6 +347,10 @@ class Game {
     cancelAnimationFrame(this.animationId);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(this.gameoverPicture, 0, 0, canvas.width, canvas.height);
+    ctx.font = "15px Verdana";
+    ctx.fillStyle = "black";
+    ctx.fillText(`Final Score: ${this.score}`, 85, 170);
+    // ctx.drawImage(zombieDieingImages[3], 160, 0, 80, 80);
   };
 
   //Verifica se o player foi morto e chama método gameOver
@@ -477,6 +481,7 @@ window.onload = () => {
   startGame();
 };
 
+//Adiciona eventListener na tela inicial
 let gameIntro = document.querySelector("#game-intro div");
 gameIntro.addEventListener("mouseover", () => {
   clickSound.play();
