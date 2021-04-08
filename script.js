@@ -10,7 +10,7 @@ background.src = "images/background.png";
 
 //gameOver image
 const gameoverPicture = new Image();
-gameoverPicture.src = "images/game-over2.png";
+gameoverPicture.src = "images/game-over.png";
 
 //Hero dieing images
 const heroDieingImages = [];
