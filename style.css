@@ -2,25 +2,24 @@ window {
   min-width: 700px;
 }
 body {
+  font-family: "Amatic SC", cursive;
   padding: 0;
   text-align: center;
-  font-family: "Verdana";
 }
 
 h1,
-h3 {
+h2 {
   margin: 0;
-  text-shadow: 3px 3px rgba(0, 0, 0, 0.6);
+  text-shadow: 2px 2px rgb(204, 255, 204);
 }
 
 h1 {
-  font-size: 3rem;
-  margin-top: 12rem;
-  color: rgb(0, 230, 0);
+  font-size: 3.5rem;
+  margin-top: 10rem;
 }
 
-h3 {
-  color: rgb(204, 255, 204);
+h2 {
+  font-weight: 900;
 }
 
 #game-intro {
@@ -30,9 +29,19 @@ h3 {
   width: 700px;
   height: 600px;
   margin: 0 auto;
-  background-image: url("images/intro.png");
+  background-image: url("images/intro2.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   background-color: white;
+}
+
+h1:hover {
+  font-size: 4rem;
+  cursor: pointer;
+}
+
+h2:hover {
+  font-size: 1.8rem;
+  cursor: pointer;
 }

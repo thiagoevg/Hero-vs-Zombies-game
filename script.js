@@ -10,7 +10,7 @@ background.src = "images/background.png";
 
 //gameOver image
 const gameoverPicture = new Image();
-gameoverPicture.src = "images/game-over.png";
+gameoverPicture.src = "images/game-over2.png";
 
 //Hero dieing images
 const heroDieingImages = [];
@@ -65,6 +65,10 @@ zombieSound.volume = 0.1;
 const screamSound = new Audio();
 screamSound.src = "sounds/scream.wav";
 screamSound.volume = 0.1;
+
+const clickSound = new Audio();
+clickSound.src = "sounds/mouseclick.wav";
+clickSound.volume = 0.1;
 
 ///////CLASS///////COMPONENT//////////////
 
@@ -196,7 +200,7 @@ class Bullet extends Component {
   constructor(x, y, width, height, img) {
     super(x, y, width, height);
     this.img = img;
-    this.dx = 5;
+    this.dx = 8;
   }
 
   killed(zombie) {
@@ -455,7 +459,7 @@ startGame = () => {
 
   //Adiciona eventListener 'click' para disparar projétil
   gameBoard.addEventListener("click", () => {
-    setTimeout(game.shoot, 200);
+    setTimeout(game.shoot, 100);
   });
 };
 
@@ -463,3 +467,8 @@ startGame = () => {
 window.onload = () => {
   startGame();
 };
+
+let gameIntro = document.querySelector("#game-intro div");
+gameIntro.addEventListener("mouseover", () => {
+  clickSound.play();
+});
