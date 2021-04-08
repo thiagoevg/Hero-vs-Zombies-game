@@ -132,6 +132,7 @@ class Hero extends Component {
         this.height
       );
     }
+
     if (this.status === "dead") {
       ctx.drawImage(
         this.dieingImagesArr[this.pictureFrame],
@@ -142,6 +143,14 @@ class Hero extends Component {
       );
     }
   };
+
+  //Corrige dimensionamento da imagem do herói
+  right() {
+    return this.x + this.width - 10;
+  }
+  top() {
+    return this.y + 10;
+  }
 }
 
 //////CLASS//////ZOMBIES////////////
@@ -197,7 +206,7 @@ class Bullet extends Component {
   constructor(x, y, width, height, img) {
     super(x, y, width, height);
     this.img = img;
-    this.dx = 8;
+    this.dx = 10;
   }
 
   //Desenha componente no canvas
@@ -216,6 +225,7 @@ class Game {
     this.zombies = [];
     this.animationId;
     this.frames = 0;
+    this.shootFrames = 0;
     this.gameoverPicture = gameoverPicture;
     this.score = 0;
   }
@@ -243,7 +253,10 @@ class Game {
   //Realizado disparo de novo projétil
   shoot = () => {
     let frames = this.player.shootingImagesArr.length;
-    this.shootAnimation(frames);
+    if (this.shootFrames > 30) {
+      this.shootAnimation(frames);
+      this.shootFrames = 0;
+    }
   };
 
   //Realiza a animação do disparo e chama a função generateBullet
@@ -409,6 +422,9 @@ class Game {
 
     //Checa Game Over
     this.checkGameOver();
+
+    //Incrementa shootFrames
+    this.shootFrames++;
   };
 }
 
@@ -452,7 +468,7 @@ startGame = () => {
 
   //Adiciona eventListener 'click' para disparar projétil
   gameBoard.addEventListener("click", () => {
-    setTimeout(game.shoot, 100);
+    setTimeout(game.shoot, 70);
   });
 };
 
