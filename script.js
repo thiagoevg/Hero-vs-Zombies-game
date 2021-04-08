@@ -44,15 +44,7 @@ for (let i = 0; i <= 7; i++) {
   zombieDieingImages.push(newImage);
 }
 
-//Zombie attacking images
-const zombieAttackingImages = [];
-for (let i = 0; i <= 7; i++) {
-  const newImage = new Image();
-  newImage.src = `images/zombie/die/die_${i + 1}.png`;
-  zombieAttackingImages.push(newImage);
-}
-
-//Projétil image
+//Bullet image
 const bullet = new Image();
 bullet.src = "images/bullet.png";
 
@@ -86,6 +78,8 @@ class Component {
     this.dy = 0;
   }
 
+  //Delimita limites geométricos dos componentes
+
   left() {
     return this.x;
   }
@@ -99,10 +93,21 @@ class Component {
     return this.y + this.height;
   }
 
+  //Redefine a posição dos componentes a cada frame
   setPosition = () => {
     this.x += this.dx;
     this.y += this.dy;
   };
+
+  //Verifica se componente foi atingido por um projétil
+  killed(component) {
+    return !(
+      this.bottom() < component.top() ||
+      this.top() > component.bottom() ||
+      this.right() < component.left() ||
+      this.left() > component.right()
+    );
+  }
 }
 
 ///////CLASS///////HERO//////////////
@@ -153,6 +158,7 @@ class Zombie extends Component {
     this.pictureFrame = 0;
   }
 
+  //Desenha componente no canvas
   draw = () => {
     this.frames++;
     if (this.status === "alive") {
@@ -183,15 +189,6 @@ class Zombie extends Component {
       );
     }
   };
-
-  killed(hero) {
-    return !(
-      this.bottom() < hero.top() ||
-      this.top() > hero.bottom() ||
-      this.right() < hero.left() ||
-      this.left() > hero.right()
-    );
-  }
 }
 
 //////////////BULLET/////////////
@@ -203,15 +200,7 @@ class Bullet extends Component {
     this.dx = 8;
   }
 
-  killed(zombie) {
-    return !(
-      this.bottom() < zombie.top() ||
-      this.top() > zombie.bottom() ||
-      this.right() < zombie.left() ||
-      this.left() > zombie.right()
-    );
-  }
-
+  //Desenha componente no canvas
   draw = () => {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   };
@@ -236,7 +225,7 @@ class Game {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  //Atualiza posicionamento e aparência dos componentes do jogo
+  //Atualiza posicionamento dos componentes do jogo
   updateComponents = () => {
     this.bullets.forEach((bullet) => {
       bullet.setPosition();
@@ -273,7 +262,7 @@ class Game {
     }, 40);
   };
 
-  //Cria projétio e adiciona na lista de componentes
+  //Cria projétio e adiciona na lista de componentes bullets
   generateBullet = () => {
     //Obs: o som do disparo precisou se instanciado aqui para evitar problemas de assincronicidade
     const bangSound = new Audio();
@@ -283,7 +272,7 @@ class Game {
     this.bullets.push(new Bullet(80, this.player.y + 70, 20, 30, bullet));
   };
 
-  //Gera zumbis em posições variadas
+  //Gera zumbis em posições aleatórias
   generateZombies() {
     this.frames++;
     if (this.frames % 50 === 0) {
@@ -298,14 +287,14 @@ class Game {
         70,
         100,
         zombieWalkingImages,
-        zombieDieingImages,
-        zombieAttackingImages
+        zombieDieingImages
       );
       this.components.push(newZombie);
       this.zombies.push(newZombie);
     }
   }
 
+  //Modifica status do zumbi de "alive" para "dead", encerra o deslocamento e reproduz som
   zombieDied = (zombie, zombieIdx) => {
     let frames = 0;
     zombie.status = "dead";
@@ -314,6 +303,7 @@ class Game {
     this.zombieDieingAnimation(frames, zombie, zombieIdx);
   };
 
+  //Realiza animação do zumbi morrendo
   zombieDieingAnimation = (frames, zombie, zombieIdx) => {
     setTimeout(() => {
       frames += 1;
@@ -326,6 +316,7 @@ class Game {
     }, 70);
   };
 
+  //Verifica se zumbi foi atingido por um projétil
   checkKill = () => {
     this.bullets.forEach((bullet, bulletIdx) =>
       this.zombies.forEach((zombie, zombieIdx) => {
@@ -338,12 +329,14 @@ class Game {
     );
   };
 
+  //Encerra a animação e desenha a tela de game-over
   gameOver = () => {
     cancelAnimationFrame(this.animationId);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(this.gameoverPicture, 0, 0, canvas.width, canvas.height);
   };
 
+  //Verifica se o player foi morto e chama método gameOver
   checkGameOver = () => {
     this.zombies.forEach((zombie, zombieIdx) => {
       if (zombie.killed(this.player)) {
@@ -353,9 +346,7 @@ class Game {
     });
   };
 
-  //////CHECAR REDUNDÂNCIA DO CÓDIGO
-  //Verificar se é possível adicionar classe genérica para hero and zombies
-
+  //Muda status do herói de "alive" para "dead" e inicia a animação
   heroDied = (hero) => {
     let frames = 0;
     hero.status = "dead";
@@ -364,6 +355,7 @@ class Game {
     this.heroDieingAnimation(frames, hero);
   };
 
+  //Animação do herói morrendo
   heroDieingAnimation = (frames, hero) => {
     setTimeout(() => {
       frames += 1;
@@ -376,6 +368,7 @@ class Game {
     }, 100);
   };
 
+  //Desenha o score atualizado na tela
   updateScore() {
     ctx.font = "30px Verdana";
     ctx.fillStyle = "white";
