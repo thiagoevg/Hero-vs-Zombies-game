@@ -2,6 +2,15 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+//Seleciona game-intro no html
+const gameIntro = document.querySelector("#game-intro");
+
+//Seleciona game-board no html
+const gameBoard = document.querySelector("#game-board");
+
+//Seleciona tela game-over no html
+const gameOver = document.getElementById("game-over");
+
 /////////CARREGA IMAGENS DOS COMPONENTES///////////
 
 //Background image
@@ -11,6 +20,10 @@ background.src = "images/background.png";
 //gameOver image
 const gameoverPicture = new Image();
 gameoverPicture.src = "images/game-over.png";
+
+//restart button
+const restartBtn = new Image();
+restartBtn.src = "images/restart.png";
 
 //Hero dieing images
 const heroDieingImages = [];
@@ -344,13 +357,11 @@ class Game {
 
   //Encerra a animação e desenha a tela de game-over
   gameOver = () => {
-    cancelAnimationFrame(this.animationId);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(this.gameoverPicture, 0, 0, canvas.width, canvas.height);
-    ctx.font = "15px Verdana";
-    ctx.fillStyle = "black";
-    ctx.fillText(`Final Score: ${this.score}`, 85, 170);
-    // ctx.drawImage(zombieDieingImages[3], 160, 0, 80, 80);
+    //Remove o canvas
+    document.body.removeChild(gameBoard);
+    //Adiciona tela de game-over
+    document.body.appendChild(gameOver);
+    document.getElementById("score").innerText = this.score;
   };
 
   //Verifica se o player foi morto e chama método gameOver
@@ -370,6 +381,7 @@ class Game {
     hero.dx = 0;
     screamSound.play();
     this.heroDieingAnimation(frames, hero);
+    cancelAnimationFrame(this.animationId);
   };
 
   //Animação do herói morrendo
@@ -377,6 +389,9 @@ class Game {
     setTimeout(() => {
       frames += 1;
       hero.pictureFrame = frames;
+      this.clear();
+      ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+      this.updateComponents();
       if (frames === hero.dieingImagesArr.length - 1) {
         this.gameOver();
         return;
@@ -437,16 +452,16 @@ class Game {
 //Faz as preparações necessárias e começa o jogo
 startGame = () => {
   // Remove canvas da tela introdutória
-  const gameBoard = document.querySelector("#game-board");
-  document.querySelector("body").removeChild(gameBoard);
+  document.body.removeChild(gameBoard);
+  //Remove game over da tela introdutória
+  document.body.removeChild(gameOver);
 
   // Adiciona eventListener à tela introdutória para o início do jogo
-  const gameIntro = document.querySelector("#game-intro");
   gameIntro.addEventListener("click", () => {
     //Remove tela introdutória
-    document.querySelector("body").removeChild(gameIntro);
+    document.body.removeChild(gameIntro);
     //Reintroduz o canvas
-    document.querySelector("body").appendChild(gameBoard);
+    document.body.appendChild(gameBoard);
     const bangSoundIntro = new Audio();
     bangSoundIntro.src = "sounds/bang.wav";
     bangSoundIntro.volume = 0.1;
@@ -482,7 +497,6 @@ window.onload = () => {
 };
 
 //Adiciona eventListener na tela inicial
-let gameIntro = document.querySelector("#game-intro div");
 gameIntro.addEventListener("mouseover", () => {
   clickSound.play();
 });
