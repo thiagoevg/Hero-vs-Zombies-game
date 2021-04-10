@@ -3,10 +3,10 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 //Seleciona game-intro no html
-const gameIntro = document.querySelector("#game-intro");
+const gameIntro = document.getElementById("game-intro");
 
 //Seleciona game-board no html
-const gameBoard = document.querySelector("#game-board");
+const gameBoard = document.getElementById("game-board");
 
 //Seleciona tela game-over no html
 const gameOver = document.getElementById("game-over");
@@ -239,7 +239,6 @@ class Game {
     this.animationId;
     this.frames = 0;
     this.shootFrames = 0;
-    this.gameoverPicture = gameoverPicture;
     this.score = 0;
   }
 
@@ -361,6 +360,13 @@ class Game {
     document.body.removeChild(gameBoard);
     //Adiciona tela de game-over
     document.body.appendChild(gameOver);
+    //Adiciona eventListener na página game-over
+    gameOver.addEventListener("click", () => {
+      document.body.removeChild(gameOver);
+      document.body.appendChild(gameIntro);
+      startGame();
+    });
+    //Atualiza final score
     document.getElementById("score").innerText = this.score;
   };
 
@@ -451,17 +457,40 @@ class Game {
 
 //Faz as preparações necessárias e começa o jogo
 startGame = () => {
-  // Remove canvas da tela introdutória
-  document.body.removeChild(gameBoard);
-  //Remove game over da tela introdutória
-  document.body.removeChild(gameOver);
-
   // Adiciona eventListener à tela introdutória para o início do jogo
   gameIntro.addEventListener("click", () => {
+    //Cria herói
+    const hero = new Hero(
+      0,
+      240,
+      80,
+      120,
+      heroShootingImages,
+      heroDieingImages
+    );
+
+    //Cria novo jogo
+    const game = new Game(hero);
+    //Adiciona herói na lista de componentes
+    game.components.push(hero);
+
+    // Adiciona eventListener para o posicionamento do player
+    document.addEventListener("mousemove", (e) => {
+      if (e.clientY >= 290 && e.clientY <= 570) {
+        hero.y = e.clientY - 90;
+      }
+    });
+
+    //Adiciona eventListener 'click' para disparar projétil
+    gameBoard.addEventListener("click", () => {
+      setTimeout(game.shoot, 70);
+    });
+
     //Remove tela introdutória
     document.body.removeChild(gameIntro);
     //Reintroduz o canvas
     document.body.appendChild(gameBoard);
+
     const bangSoundIntro = new Audio();
     bangSoundIntro.src = "sounds/bang.wav";
     bangSoundIntro.volume = 0.1;
@@ -469,30 +498,14 @@ startGame = () => {
     //Inicia o jogo efetivamente
     game.start();
   });
-
-  //Cria herói
-  const hero = new Hero(0, 240, 80, 120, heroShootingImages, heroDieingImages);
-
-  //Cria novo jogo
-  const game = new Game(hero);
-  //Adiciona herói na lista de componentes
-  game.components.push(hero);
-
-  //Adiciona eventListener para o posicionamento do player
-  document.addEventListener("mousemove", (e) => {
-    if (e.clientY >= 290 && e.clientY <= 570) {
-      hero.y = e.clientY - 90;
-    }
-  });
-
-  //Adiciona eventListener 'click' para disparar projétil
-  gameBoard.addEventListener("click", () => {
-    setTimeout(game.shoot, 70);
-  });
 };
 
 //Espera o tempo de processamento dos componentes para iniciar o jogo
 window.onload = () => {
+  // Remove canvas da tela introdutória
+  document.body.removeChild(gameBoard);
+  //Remove game over da tela introdutória
+  document.body.removeChild(gameOver);
   startGame();
 };
 
