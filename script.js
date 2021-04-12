@@ -3,13 +3,13 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 //Seleciona game-intro no html
-const gameIntro = document.getElementById("game-intro");
+let gameIntro = document.getElementById("game-intro");
 
 //Seleciona game-board no html
 const gameBoard = document.getElementById("game-board");
 
 //Seleciona tela game-over no html
-const gameOver = document.getElementById("game-over");
+let gameOver = document.getElementById("game-over");
 
 /////////CARREGA IMAGENS DOS COMPONENTES///////////
 
@@ -359,11 +359,31 @@ class Game {
     //Remove o canvas
     document.body.removeChild(gameBoard);
     //Adiciona tela de game-over
-    document.body.appendChild(gameOver);
+    document.body.innerHTML = `<div id="game-over">
+      <div>
+        <h1>game over</h1>
+        <h2>click to play again</h2>
+      </div>
+      <div>
+        <h3>Final score: <span id="score">0</span></h3>
+      </div>
+    </div>`;
+    //Localiza novo game-over no HTML
+    gameOver = document.getElementById("game-over");
     //Adiciona eventListener na página game-over
     gameOver.addEventListener("click", () => {
+      //Remove tela game-over
       document.body.removeChild(gameOver);
-      document.body.appendChild(gameIntro);
+      //Reintroduz tela introdutória
+      document.body.innerHTML = `<div id="game-intro">
+        <div>
+          <h1>Hero vs Zombies</h1>
+          <h2>click to start</h2>
+        </div>
+      </div>`;
+      //Localiza nova intro no HTML
+      gameIntro = document.getElementById("game-intro");
+      //Reinicia o jogo
       startGame();
     });
     //Atualiza final score
